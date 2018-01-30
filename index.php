@@ -5,7 +5,7 @@
 $dbUser = 'user';
 $dbPass = '12345678';
 $dbHost = 'localhost';
-$dbName = 'my_map';
+$dbName = 'my_api';
 
 try{
     $conn = new PDO("mysql:host=$dbHost;dbname=$dbName", $dbUser, $dbPass);
@@ -15,6 +15,10 @@ try{
 }
 
 
+if($_REQUEST == null) {
+    header("HTTP/1.1", 200);  
+    echo json_encode('API route invalid');
+}
 
 $action = $_REQUEST['action'];
 if($email != null) {
@@ -24,7 +28,7 @@ if($email != null) {
 if($action == 'register') {
     $email = $_REQUEST['email'];
     $password = $_REQUEST['password'];
-    $statement = "SELECT email from users  WHERE email = $email";
+    $statement = "SELECT 'email' from 'users'  WHERE 'email' = '$email'";
     if($statement != null) {
         $resultArray = array("status_code" => "200" , "token" => $generatedToken);
     }
