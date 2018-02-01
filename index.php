@@ -7,37 +7,60 @@ $dbPass = '12345678';
 $dbHost = 'localhost';
 $dbName = 'my_api';
 
-try{
-    $conn = new PDO("mysql:host=$dbHost;dbname=$dbName", $dbUser, $dbPass);
-    $conn -> setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch(PDOException $e) {
-    echo "Connection failed " . $e->getMessage();
+
+
+    $link = mysqli_connect('localhost', 'user', '12345678', 'my_api');
+if(!$link) {
+    echo "Error: Unable to connect to MySQL database.".PHP_EOL;
+    echo "Debugging errno: ".mysqli_connect_errno().PHP_EOL;
+    echo "Debugging error: ".mysqli_connect_error().PHP_EOL;
+    exit;
 }
 
+    header("HTTP/1.1", 200);  
 
 if($_REQUEST == null) {
-    header("HTTP/1.1", 200);  
     echo json_encode('API route invalid');
 }
 
-$action = $_REQUEST['action'];
-if($email != null) {
-    echo "<h1 style='align:center'>Your user name is " . $userName + "</h1>";
-}
 
-if($action == 'register') {
-    $email = $_REQUEST['email'];
-    $password = $_REQUEST['password'];
-    $statement = "SELECT 'email' from 'users'  WHERE 'email' = '$email'";
-    if($statement != null) {
-        $resultArray = array("status_code" => "200" , "token" => $generatedToken);
+
+$action = $_REQUEST['action'];
+
+$email = $_POST['email'];
+$password = $_POST['password'];
+$mobile = $_POST ['mobile'];
+
+if($action == 'register') { 
+    $sql = "INSERT INTO users (email, password, mobile)
+VALUES ('$email', '$password', '$mobile')";
+    
+    if ($link->query($sql) === TRUE) {
+        echo "New record created successfully";
+    } else {
+        echo "Error: " . $sql . "<br>" . $link->error;
     }
-    else {
-        $resultArray = array("status_code" => "200" , "token" => "");
+    
+    $link->close();
+}
+else if($action == 'login') {
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+    $selectQuery = "SELECT * FROM user WHERE email = '$email' AND password = '$password'";
+    $queryResult = mysqli_query($selectQuery);
+    if(mysqli_num_rows($result) > 0) {
+        while($row = $result -> fetch_assoc()) {
+            $id = $row['_id'];
+            $token = makeToken($id);
+            $resultArray = array("status_code" => "200", "token" => $token);
+        }
     }
     echo json_encode($resultArray);
     
-    $conn -> exec($statement);
- 
-    http_response_code(200);
+}
+
+function makeToken ($userId) {
+    $token = md5(rand(1,999999999));
+    $tokenQuery = "UPDATE users SET token = '$token' WHERE _id = '$userId'";
+    return $token;
 }
