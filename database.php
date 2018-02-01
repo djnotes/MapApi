@@ -5,12 +5,7 @@
  */
 function openDb() {
     
-//     //Create a connection
-//     $dbUser = 'gigfa_18332046';
-//     $dbPass = 'abcd1357';
-//     $dbHost = 'sql203.gigfa.com';
-//     $dbName = 'gigfa_18332046_my_api';
-    
+
     //Create a connection
     $dbUser = 'user';
     $dbPass = '12345678';
